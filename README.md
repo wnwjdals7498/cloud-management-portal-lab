@@ -10,6 +10,7 @@ PHP·CodeIgniter 기반의 관리포털과 Linux IaaS·고가용성 실습을 �
 
 - [통합 구축 계획](docs/plan.md)
 - [Linux IaaS·고가용성 세부 계획](docs/linux-iaas-ha.md)
+- [첫 동작 결과 세부 계획](docs/first-working-slice.md)
 - [포털 UI 가이드](docs/ui/guide.md)
 - [포털 HTML 목업](docs/ui/mockup.html)
 

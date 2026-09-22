@@ -10,6 +10,7 @@
 
 - 저장소 통합 방향과 문서 구조 정리
 - [UI 가이드](ui/guide.md)와 [HTML 목업](ui/mockup.html) 제작
+- [첫 동작 결과 세부 계획](first-working-slice.md) 수립 중
 - 실제 포털·인프라 구현, 배포, 검증은 아직 시작하지 않음
 
 ## 단계
