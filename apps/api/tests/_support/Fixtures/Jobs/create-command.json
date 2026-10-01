@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "request_id": "request-fixture-01",
+  "job_id": "job-fixture-01",
+  "vm_id": "vm-fixture-01",
+  "operation": "create",
+  "attempt": 1,
+  "external_idempotency_key": "external-key-fixture-01",
+  "profile": {
+    "profile_id": "profile-fixture-01",
+    "profile_version": "profile-version-fixture-01",
+    "snapshot": {"vcpus": 1, "memory_mb": 1024, "disk_gb": 20, "network_ref": "simulated-only"}
+  },
+  "mode": "simulated"
+}

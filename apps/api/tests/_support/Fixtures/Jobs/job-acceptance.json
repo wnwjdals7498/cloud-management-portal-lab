@@ -1,0 +1,7 @@
+{
+  "job_id": "job-fixture-01",
+  "vm_id": "vm-fixture-01",
+  "status": "queued",
+  "mode": "simulated",
+  "request_id": "request-fixture-01"
+}

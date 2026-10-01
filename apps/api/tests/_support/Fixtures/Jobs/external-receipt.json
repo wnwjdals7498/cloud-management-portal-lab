@@ -1,0 +1,7 @@
+{
+  "external_job_id": "external-job-fixture-01",
+  "external_vm_id": "external-vm-fixture-01",
+  "status": "accepted",
+  "observed_at": "2026-10-01T12:00:00+09:00",
+  "mode": "simulated"
+}

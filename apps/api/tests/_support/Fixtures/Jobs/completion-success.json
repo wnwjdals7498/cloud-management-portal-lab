@@ -1,0 +1,11 @@
+{
+  "event_id": "event-fixture-01",
+  "job_id": "job-fixture-01",
+  "external_job_id": "external-job-fixture-01",
+  "external_vm_id": "external-vm-fixture-01",
+  "attempt": 1,
+  "status": "succeeded",
+  "observed_at": "2026-10-01T03:00:00Z",
+  "error_code": null,
+  "mode": "simulated"
+}
