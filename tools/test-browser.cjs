@@ -1,0 +1,92 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert/strict');
+const {execFileSync} = require('node:child_process');
+const root = path.resolve(__dirname, '..');
+const {chromium} = require(path.join(root, '.runtime/browser-test/node_modules/playwright'));
+const config = JSON.parse(fs.readFileSync(path.join(root, '.runtime/integration.json'), 'utf8'));
+const environment = {...process.env, PORTAL_CONFIG: path.join(root, '.runtime/integration.json')};
+const php = path.join(root, '.runtime/tools/php/php.exe');
+const evidence = path.join(root, '.runtime/evidence');
+fs.mkdirSync(evidence, {recursive:true});
+
+async function login(page, origin, identifier) {
+  await page.goto(origin, {waitUntil:'networkidle'});
+  await page.locator('#login-identifier').fill(identifier);
+  await page.locator('#login-credential').fill(config.seed_password);
+  await page.locator('[data-login-submit]').click();
+  await page.locator('.portal-shell').waitFor({state:'visible'});
+}
+
+(async()=>{
+  const browser = await chromium.launch({channel:'chrome',headless:true,args:['--host-resolver-rules=MAP customer.localhost 127.0.0.1, MAP admin.localhost 127.0.0.1']});
+  const errors=[];
+  try {
+    const context=await browser.newContext({viewport:{width:1360,height:860},locale:'ko-KR',timezoneId:'Asia/Seoul'});
+    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.name));
+    await login(page,'http://customer.localhost:18081/','membera@example.test');
+    await page.locator('.metric-card').first().waitFor({state:'visible'});
+    await page.locator('.loading-state').waitFor({state:'detached'});
+    assert((await page.locator('.portal-table tbody').first().innerText()).includes('vm_'),'Actual VM identifiers are not rendered');
+    assert((await page.locator('.portal-table tbody').first().innerText()).includes('vCPU'),'Actual profile specifications are not rendered');
+    assert((await page.locator('body').innerText()).includes('모의'));
+    await page.screenshot({path:path.join(evidence,'customer-dashboard.png'),fullPage:true});
+    await page.locator('[data-view="vms"]').click();
+    await page.locator('.portal-table tbody tr').first().waitFor({state:'visible'});
+    await page.locator('.portal-table tbody tr').first().getByRole('button',{name:'상세'}).click();
+    await page.locator('.detail-grid').first().waitFor({state:'visible'});
+    assert((await page.locator('.detail-grid').first().innerText()).includes('vm_'),'VM detail did not follow canonical identifier');
+    await page.locator('[data-view="jobs"]').click();
+    await page.locator('.portal-table tbody tr').first().waitFor({state:'visible'});
+    assert((await page.locator('.portal-table tbody').first().innerText()).includes('job_'),'Actual job identifiers are not rendered');
+    await page.locator('.portal-table tbody tr').first().getByRole('button',{name:'상세'}).click();
+    await page.locator('.detail-grid').first().waitFor({state:'visible'});
+    assert((await page.locator('.detail-grid').first().innerText()).includes('job_'),'Job detail did not follow canonical identifier');
+    await page.locator('[data-view="jobs"]').click();
+    await page.locator('.portal-table tbody tr').first().waitFor({state:'visible'});
+    await page.setViewportSize({width:412,height:860});
+    assert(await page.locator('body').evaluate(el=>el.scrollWidth<=window.innerWidth+2),'Mobile page spills outside viewport');
+    await page.screenshot({path:path.join(evidence,'customer-mobile.png'),fullPage:true});
+    await page.locator('[data-action="logout"]').click();
+    await page.locator('#login-identifier').waitFor({state:'visible'});
+    // Reuse the same application instance after logout to catch duplicate event bindings.
+    await page.locator('#login-identifier').fill('membera@example.test');
+    await page.locator('#login-credential').fill(config.seed_password);
+    await page.locator('[data-login-submit]').click();
+    await page.locator('.metric-card').first().waitFor({state:'visible'});
+    await page.locator('.loading-state').waitFor({state:'detached'});
+    let detailRequests=0;
+    const countDetails=request=>{if(request.method()==='GET' && /\/api\/v1\/vms\/vm_[^/?]+$/.test(request.url()))detailRequests++;};
+    page.on('request',countDetails);
+    await page.locator('[data-view="vms"]').click();
+    await page.locator('.portal-table tbody tr').first().waitFor({state:'visible'});
+    await page.locator('.portal-table tbody tr').first().getByRole('button',{name:'상세'}).click();
+    await page.locator('.detail-grid').first().waitFor({state:'visible'});
+    assert.equal(detailRequests,1,'Logout/relogin duplicated a detail handler');
+    page.off('request',countDetails);
+    const adminContext=await browser.newContext({viewport:{width:1360,height:860},locale:'ko-KR'});
+    const adminPage=await adminContext.newPage();adminPage.on('pageerror',e=>errors.push(e.name));
+    await login(adminPage,'http://admin.localhost:18081/','admin@example.test');
+    await adminPage.locator('.metric-card').first().waitFor({state:'visible'});
+    await adminPage.screenshot({path:path.join(evidence,'admin-dashboard.png'),fullPage:true});
+    assert((await adminPage.locator('body').innerText()).includes('관리자'));
+    const applicantContext=await browser.newContext({viewport:{width:1360,height:860},locale:'ko-KR'});
+    const applicant=await applicantContext.newPage();applicant.on('pageerror',e=>errors.push(e.name));
+    await login(applicant,'http://customer.localhost:18081/','memberb@example.test');
+    await applicant.locator('[data-view="request"]').click();
+    await applicant.locator('#profile-selection option').nth(1).waitFor({state:'attached'});
+    const profile=await applicant.locator('#profile-selection option').nth(1).getAttribute('value');
+    await applicant.locator('#profile-selection').selectOption(profile);
+    const accepted=applicant.waitForResponse(r=>r.url().endsWith('/api/v1/vms') && r.request().method()==='POST');
+    await applicant.locator('[data-submit-request]').click();
+    assert.equal((await accepted).status(),202,'Browser request was not accepted');
+    execFileSync(php,[path.join(root,'tools/portal-cli.php'),'api','tick'],{cwd:root,env:environment,windowsHide:true,stdio:'pipe'});
+    execFileSync(php,[path.join(root,'tools/portal-cli.php'),'vmm-simulator','tick'],{cwd:root,env:environment,windowsHide:true,stdio:'pipe'});
+    execFileSync(php,[path.join(root,'tools/portal-cli.php'),'api','tick'],{cwd:root,env:environment,windowsHide:true,stdio:'pipe'});
+    await applicant.locator('[data-view="jobs"]').click();
+    await applicant.locator('.portal-table tbody tr').first().waitFor({state:'visible'});
+    assert.deepEqual(errors,[],'Browser JavaScript errors occurred');
+    fs.writeFileSync(path.join(evidence,'browser-results.json'),JSON.stringify({result:'pass',checks:['customer login and real API data','VM/job navigation','responsive mobile viewport','logout/relogin without duplicate handler','admin data','browser submission','no JavaScript page errors']},null,2)+'\n');
+    console.log('P4 browser checks passed: roles, actual API data, navigation, mobile layout, logout, submission');
+  } finally {await browser.close();}
+})().catch(error=>{console.error(error.name+': '+error.message);process.exitCode=1;});
