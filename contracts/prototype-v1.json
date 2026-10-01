@@ -1,0 +1,31 @@
+{
+  "version": "v1",
+  "mode": "simulated",
+  "auth": {"identifier": "email", "groups": ["member", "admin"], "csrf": "session", "csrfRegenerateEveryRequest": true, "clientMutationPolicy": "serialize mutation requests and consume refreshed token metadata; stale tokens are rejected"},
+  "api": {
+    "login": {"required": ["login_identifier", "credential"], "additionalProperties": false},
+    "create": {"required": ["profile_id"], "additionalProperties": false, "idempotencyHeader": "Idempotency-Key"},
+    "receipt": ["job_id", "vm_id", "status", "mode", "request_id"],
+    "errors": {"format": ["error.code", "error.message", "request_id", "mode"], "validation": 400, "authentication": 401, "authorization": 403, "hiddenResource": 404, "conflictOrQuota": 409, "unavailable": 503}
+  },
+  "jobs": {"states": ["queued", "dispatching", "running", "succeeded", "failed", "reconciliation_required"], "soleWriter": "Jobs", "quota": "actor-row lock; only new idempotency consumes a slot; failed create releases; unknown retains"},
+  "viewModels": {
+    "vm": ["vm_id", "owner_user_id", "profile_id", "profile_version", "profile", "mode", "lifecycle_state", "power_state", "created_at", "updated_at", "observed_at", "latest_job"],
+    "publicProfile": ["vcpus", "memory_mb", "disk_gb"],
+    "job": ["job_id", "vm_id", "operation", "state", "request_id", "mode", "current_attempt_no", "created_at", "updated_at", "finished_at", "attempts"],
+    "latestJobId": "job_id",
+    "timestamps": "UTC MySQL DATETIME strings are interpreted as UTC; display Asia/Seoul"
+  },
+  "command": {"required": ["version", "request_id", "job_id", "vm_id", "operation", "attempt", "external_idempotency_key", "profile", "mode"], "operations": ["create"], "additionalProperties": false},
+  "externalReceipt": {"required": ["external_job_id", "external_vm_id", "status", "observed_at", "mode"]},
+  "completion": {"required": ["event_id", "job_id", "external_job_id", "external_vm_id", "attempt", "status", "observed_at", "error_code", "mode"], "statuses": ["succeeded", "failed"], "additionalProperties": false, "contentConflict": "same event_id with different canonical payload quarantines without overwriting"},
+  "simulation": {"scenarios": ["success", "failure", "late", "missing", "duplicate"], "algorithm": "sha256(job_id + seed + profile_version) deterministic weighted draw stored once", "forceScenario": "development CLI only"},
+  "prototypeSecurity": {"webIngress": "loopback nginx, registered console host, private development proxy credential", "callbackIngress": "loopback with private development simulator credential", "realIngress": "existing mTLS decision; not implemented in Prototype"},
+  "sharedPorts": {
+    "Clock": "utcNow(): DateTimeImmutable; monotonic(): float",
+    "AuditSink": "append(array event): string; caller-owned transaction",
+    "EventLogger": "write(string event, array context): bool",
+    "Runtime": "config(): array; root(): string; private local config is never a response",
+    "PortalException": "errorCode, safeMessage, httpStatus"
+  }
+}

@@ -1,0 +1,4 @@
+# Keep checksummed lockfiles and bundled UI bytes unchanged on Windows checkout.
+apps/**/composer.lock -text
+packages/ui/** -text
+apps/*-console/public/assets/** -text

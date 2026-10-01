@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "mode": "simulated",
+  "runtime": {
+    "php": {
+      "version": "8.4.26",
+      "url": "https://downloads.php.net/~windows/releases/php-8.4.26-nts-Win32-vs17-x64.zip",
+      "sha256": "da68394f9193b7f6b89d0c76861a4034ae10efee7fd55a7255d8118c2acf70d7"
+    },
+    "composer": {
+      "version": "2.10.3",
+      "url": "https://getcomposer.org/download/2.10.3/composer.phar",
+      "sha256": "7a2d379d5b8ffdaa028580ef26494c36d2feef4b178d3dd1473a4dbc5e17c8d6"
+    },
+    "nginx": {
+      "url": "https://nginx.org/download/nginx-1.31.6.zip",
+      "sha256": "bb65edcfc22a2214a4afaac59f038f560c02b98d4b49c5dca1206d3cc5d631c9"
+    },
+    "mysql": {
+      "version": "8.4.11",
+      "url": "https://cdn.mysql.com/Downloads/MySQL-8.4/mysql-8.4.11-winx64.zip",
+      "sha256": "a492371d687d2bab088b0062581144a0044b8964baefdf4faa579292b423d25c"
+    }
+  },
+  "apps": {
+    "api": {
+      "composer_lock_sha256": "99125baf83db4db4c7c6b001b9452fef78f11b8b2812fa0c5e910eab974efd7a",
+      "dependencies": {
+        "codeigniter4/framework": "v4.7.4",
+        "codeigniter4/settings": "v2.4.0",
+        "codeigniter4/shield": "v1.4.1",
+        "laminas/laminas-escaper": "2.18.0",
+        "psr/log": "3.0.2"
+      }
+    },
+    "vmm-simulator": {
+      "composer_lock_sha256": "db7cf8ba6bad9a035041f71777e0a513f90804c6d134a453fa22bb664fa9925e",
+      "dependencies": {
+        "codeigniter4/framework": "v4.7.4",
+        "laminas/laminas-escaper": "2.18.0",
+        "psr/log": "3.0.2"
+      }
+    },
+    "customer-console": {
+      "composer_lock_sha256": "db7cf8ba6bad9a035041f71777e0a513f90804c6d134a453fa22bb664fa9925e",
+      "dependencies": {
+        "codeigniter4/framework": "v4.7.4",
+        "laminas/laminas-escaper": "2.18.0",
+        "psr/log": "3.0.2"
+      }
+    },
+    "admin-console": {
+      "composer_lock_sha256": "db7cf8ba6bad9a035041f71777e0a513f90804c6d134a453fa22bb664fa9925e",
+      "dependencies": {
+        "codeigniter4/framework": "v4.7.4",
+        "laminas/laminas-escaper": "2.18.0",
+        "psr/log": "3.0.2"
+      }
+    }
+  },
+  "frontend": {
+    "bootstrap": {
+      "version": "5.3.8",
+      "source": "https://registry.npmjs.org/bootstrap/-/bootstrap-5.3.8.tgz",
+      "license": "MIT",
+      "files": {
+        "packages/ui/bootstrap/bootstrap.bundle.min.js": "e4fd49181388c48ec5040bd3fe66f57c29c8e67fcd8502b3354b96ec7ab47cc7",
+        "packages/ui/bootstrap/bootstrap.min.css": "d85327d99c7a3ee1f9b5d0500d1370acea3ad2db39c163c2f51f232baedbdede",
+        "packages/ui/bootstrap/LICENSE": "4620c84ad5ce8602ff65640ed6b7c8b78ebb9e036584f0ebc1ccc88206a4bb51"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+.runtime/
+**/vendor/
+**/.env
+**/writable/*
+!**/writable/.gitkeep
+**/.phpunit.result.cache
+**/.phpunit.cache/
+**/node_modules/
+**/build/
+**/__pycache__/
