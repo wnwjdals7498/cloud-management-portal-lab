@@ -1,0 +1,12 @@
+{
+  "profile_version": "profile-fixture-01",
+  "seed": "seed-fixture-01",
+  "weights": {"success": 70, "failure": 15, "late": 5, "missing": 5, "duplicate": 5},
+  "delay_min_seconds": 2,
+  "delay_max_seconds": 15,
+  "late_min_seconds": 30,
+  "late_max_seconds": 60,
+  "duplicate_delay_seconds": 2,
+  "maximum_pending": 80,
+  "error_codes": ["SIM_IMAGE_UNAVAILABLE", "SIM_STORAGE_FULL"]
+}
