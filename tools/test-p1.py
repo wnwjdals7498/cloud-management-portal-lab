@@ -75,6 +75,11 @@ def main():
     admin = Client('admin.localhost')
     assert 'admin' in admin.login('admin@example.test')['user_context']['groups']
     assert admin.request('GET','/api/v1/auth/me')[0] == 200
+    literal = Client('127.0.0.1')
+    assert literal.login('membera@example.test')['user_context']['groups'] == ['member']
+    assert literal.request('GET','/api/v1/auth/me')[0] == 200
+    assert literal.request('POST','/api/v1/auth/logout',{})[0] == 200
+    assert literal.request('GET','/api/v1/auth/me')[0] == 401
     try:
         urllib.request.build_opener(urllib.request.ProxyHandler({})).open('http://127.0.0.1:18100/api/v1/auth/csrf',timeout=10)
         raise AssertionError('Direct API request was accepted')

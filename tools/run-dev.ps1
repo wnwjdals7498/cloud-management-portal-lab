@@ -41,10 +41,11 @@ http {
   server { listen 127.0.0.1:18080 default_server; server_name _; return 403; }
 '@
 foreach($portalWeb in @(@{host='customer.localhost';port=18300},@{host='admin.localhost';port=18400})){
+    $portalServerNames=if($portalWeb.host -eq 'customer.localhost'){'customer.localhost localhost 127.0.0.1'}else{$portalWeb.host}
     $portalNginxConfig+=@"
   server {
     listen 127.0.0.1:18080;
-    server_name $($portalWeb.host);
+    server_name $portalServerNames;
     location /api/ {
       proxy_pass http://127.0.0.1:18100;
       proxy_set_header Host $($portalWeb.host);
