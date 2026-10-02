@@ -42,7 +42,7 @@ pwsh -NoProfile -File tools/start-dev.ps1
 
 | 항목 | 접속·저장 위치 |
 | --- | --- |
-| 고객 콘솔 | [http://customer.localhost:18080/](http://customer.localhost:18080/) |
+| 고객 콘솔 | [http://127.0.0.1:18080/](http://127.0.0.1:18080/) · 별칭 [customer.localhost](http://customer.localhost:18080/) |
 | 관리자 콘솔 | [http://admin.localhost:18080/](http://admin.localhost:18080/) |
 | 초기 계정·비밀번호 | `.runtime/login.txt`에서 로컬 확인. 관리자 1개·회원 2개를 준비 |
 | 개발 설정·키 | `.runtime/local.json`, 각 앱의 `.env` |

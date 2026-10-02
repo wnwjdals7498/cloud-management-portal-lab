@@ -11,12 +11,14 @@ python tools/bootstrap-runtime.py
 pwsh -NoProfile -File tools/start-dev.ps1
 ```
 
-- [고객 콘솔](http://customer.localhost:18080/)
+- [고객 콘솔](http://127.0.0.1:18080/) · [별칭 customer.localhost](http://customer.localhost:18080/)
 - [관리자 콘솔](http://admin.localhost:18080/)
 
 초기 계정은 관리자와 테스트 회원이며 자격 증명은 Git에서 제외한 `.runtime/login.txt`에 둔다. 자동 생성한 테스트 비밀번호·DB 비밀번호·프록시/모의 서비스 키를 공유 문서에 복사하지 않는다. 계정 준비 재실행은 동일 계정을 반환한다.
 
 이미 실행 중이면 먼저 중지한다. 웹·worker와 MySQL은 loopback 주소에만 바인딩한다. 이 개발 경로는 로컬 HTTP이며 사설망 배포의 TLS/mTLS는 E/R 단계에서 검증한다. 외부 접근을 위해 바인딩이나 포트를 임의로 확대하지 않는다.
+
+이름 해석이 안 되면 고객 콘솔은 `http://127.0.0.1:18080/`로 접속한다. 연결 거부가 계속되면 `start-dev.ps1`로 서버 실행을 확인하고 기존 브라우저 탭을 새로고침한다. `localhost`도 고객 콘솔의 명시적 별칭이며 API 프록시는 기존 고객 출처·인증 계약을 유지한다.
 
 중지는 아래 명령이다. 포털·worker·프로젝트 전용 MySQL만 종료하고 데이터는 보존한다.
 
